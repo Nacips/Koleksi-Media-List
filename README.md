@@ -1,0 +1,1 @@
+Web ini dapat dijadikan sebagai list tontonan atau bacaan, terdapat sistem login mengggunakan emaial sedniri dan juga user dapat menginput judul, gambar juga status dari tontonan atau bacaan itu sendiri seperti sudah ditonton, belum ditonton, sedang ditonton atau sudah dibaca, belum dibaca, dan sedang dibaca.
