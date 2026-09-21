@@ -68,7 +68,6 @@ $title = "Dashboard List";
             box-shadow: 0 6px 15px rgba(255, 105, 180, 0.25);
         }
         
-        /* Menggunakan aspect-ratio yang sama persis untuk semua perangkat agar proporsi poster terjaga */
         .card-img-container {
             position: relative !important;
             width: 100% !important;
@@ -87,9 +86,9 @@ $title = "Dashboard List";
             left: 6px;
             background-color: #ff3366;
             color: #ffffff;
-            font-size: 0.65rem;
+            font-size: 0.60rem;
             font-weight: 800;
-            padding: 2px 6px;
+            padding: 2px 5px;
             border-radius: 4px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             z-index: 2;
@@ -105,6 +104,20 @@ $title = "Dashboard List";
             border-radius: 4px;
             backdrop-filter: blur(4px);
             z-index: 2;
+        }
+        .badge-status {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(255, 51, 102, 0.85);
+            color: #fff;
+            font-size: 0.55rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            backdrop-filter: blur(4px);
+            z-index: 2;
+            text-transform: capitalize;
         }
         .card-title-text {
             font-weight: 700;
@@ -192,7 +205,7 @@ $title = "Dashboard List";
                     <?php endforeach; ?>
                 </div>
                 
-                <!-- Layout Card Grid: Menggunakan row-cols-3 untuk mobile agar lebih rapat & melebar seperti desktop -->
+                <!-- Layout Card Grid -->
                 <div class="row row-cols-3 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-2 g-md-3">
                     <?php if (mysqli_num_rows($resultAll) > 0) : ?>
                         <?php while ($row = mysqli_fetch_assoc($resultAll)) : ?>
@@ -203,6 +216,7 @@ $title = "Dashboard List";
                                             <span class="badge-up">UP</span>
                                             <img src="<?= htmlspecialchars($row['gambar']); ?>" alt="<?= htmlspecialchars($row['nama']); ?>" onerror="this.src='https://via.placeholder.com/200x280?text=No+Image'">
                                             <span class="badge-kategori"><?= $row['kategori']; ?></span>
+                                            <span class="badge-status"><?= htmlspecialchars($row['status']); ?></span>
                                         </div>
                                     </div>
                                     <div class="card-title-text" title="<?= htmlspecialchars($row['nama']); ?>">
