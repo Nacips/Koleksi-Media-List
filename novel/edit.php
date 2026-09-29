@@ -24,10 +24,14 @@ if (!$data) {
     exit();
 }
 
+// Cek apakah gambar saat ini berupa URL atau File lokal
+$is_url = filter_var($data['gambar'], FILTER_VALIDATE_URL);
+
 // Proses form update
 if (isset($_POST['update'])) {
     $nama   = mysqli_real_escape_string($conn, $_POST['nama']);
     $status = mysqli_real_escape_string($conn, $_POST['status']);
+    $review = mysqli_real_escape_string($conn, $_POST['review']); // Ambil data review
     $gambar = $data['gambar']; // Default menggunakan gambar lama
 
     $tipe_input = $_POST['tipe_input'] ?? 'url';
@@ -62,8 +66,8 @@ if (isset($_POST['update'])) {
         }
     }
 
-    // Eksekusi Query Update
-    $query = "UPDATE novel SET nama = '$nama', gambar = '$gambar', status = '$status' WHERE id = '$id'";
+    // Eksekusi Query Update dengan tambahan kolom review
+    $query = "UPDATE novel SET nama = '$nama', gambar = '$gambar', status = '$status', review = '$review' WHERE id = '$id'";
 
     if (mysqli_query($conn, $query)) {
         header("Location: index.php");
@@ -86,7 +90,6 @@ include '../templates/navbar.php';
                     <div class="card p-3 p-md-4 border-0 shadow-sm rounded-4" style="background-color: #ffebf0;">
                         <h4 class="fw-bold mb-4" style="color: var(--primary);">Edit Novel</h4>
                         
-                        <!-- Tambahkan enctype agar form bisa memproses file upload -->
                         <form method="POST" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label class="form-label">Nama Novel</label>
@@ -95,24 +98,35 @@ include '../templates/navbar.php';
 
                             <div class="mb-3">
                                 <label class="form-label">Gambar</label>
+                                
+                                <!-- Preview Gambar Saat Ini -->
+                                <div class="mb-2">
+                                    <small class="text-muted d-block mb-1">Gambar saat ini:</small>
+                                    <?php if ($is_url): ?>
+                                        <img src="<?= htmlspecialchars($data['gambar']); ?>" alt="Preview" class="rounded" style="width: 80px; height: 100px; object-fit: cover;">
+                                    <?php else: ?>
+                                        <img src="../uploads/<?= htmlspecialchars($data['gambar']); ?>" alt="Preview" class="rounded" style="width: 80px; height: 100px; object-fit: cover;">
+                                    <?php endif; ?>
+                                </div>
+
                                 <div class="d-flex gap-3 mb-2">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="tipe_input" id="tipeUrl" value="url" checked onclick="toggleInput('url')">
+                                        <input class="form-check-input" type="radio" name="tipe_input" id="tipeUrl" value="url" <?= $is_url ? 'checked' : ''; ?> onclick="toggleInput('url')">
                                         <label class="form-check-label" for="tipeUrl">Gunakan URL</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="tipe_input" id="tipeFile" value="file" onclick="toggleInput('file')">
-                                        <label class="form-check-label" for="tipeFile">Upload File</label>
+                                        <input class="form-check-input" type="radio" name="tipe_input" id="tipeFile" value="file" <?= !$is_url ? 'checked' : ''; ?> onclick="toggleInput('file')">
+                                        <label class="form-check-label" for="tipeFile">Upload File Baru</label>
                                     </div>
                                 </div>
 
-                                <div id="inputUrlContainer">
-                                    <input type="url" name="gambar_url" id="inputUrl" class="form-control rounded-pill px-3" placeholder="https://...">
+                                <div id="inputUrlContainer" style="<?= $is_url ? '' : 'display: none;'; ?>">
+                                    <input type="url" name="gambar_url" id="inputUrl" class="form-control rounded-pill px-3" placeholder="https://..." value="<?= $is_url ? htmlspecialchars($data['gambar']) : ''; ?>">
                                 </div>
 
-                                <div id="inputFileContainer" style="display: none;">
+                                <div id="inputFileContainer" style="<?= !$is_url ? '' : 'display: none;'; ?>">
                                     <input type="file" name="gambar_file" id="inputFile" class="form-control rounded-pill px-3" accept="image/*">
-                                    <div class="form-text small text-muted mt-1">Format yang diizinkan: JPG, JPEG, PNG, WEBP, GIF.</div>
+                                    <div class="form-text small text-muted mt-1">Biarkan kosong jika tidak ingin mengubah file gambar. Format diizinkan: JPG, JPEG, PNG, WEBP, GIF.</div>
                                 </div>
                             </div>
 
@@ -123,6 +137,12 @@ include '../templates/navbar.php';
                                     <option value="Unread" <?= $data['status'] == 'Unread' ? 'selected' : ''; ?>>Unread</option>
                                     <option value="Finished" <?= $data['status'] == 'Finished' ? 'selected' : ''; ?>>Finished</option>
                                 </select>
+                            </div>
+
+                            <!-- Input Review / Catatan -->
+                            <div class="mb-3">
+                                <label class="form-label">Review / Catatan</label>
+                                <textarea name="review" class="form-control rounded-3" rows="3" placeholder="Tulis ulasan atau kesan-kesan singkat..."><?= htmlspecialchars($data['review'] ?? ''); ?></textarea>
                             </div>
 
                             <div class="d-flex flex-column flex-sm-row gap-2 mt-4">

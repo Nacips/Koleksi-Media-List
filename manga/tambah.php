@@ -10,6 +10,7 @@ if (!isset($_SESSION['login'])) {
 if (isset($_POST['simpan'])) {
     $nama   = mysqli_real_escape_string($conn, $_POST['nama']);
     $status = $_POST['status'];
+    $review = mysqli_real_escape_string($conn, $_POST['review']); // Ambil data review
     $gambar = "";
 
     $tipe_input = $_POST['tipe_input'];
@@ -33,7 +34,7 @@ if (isset($_POST['simpan'])) {
             $dest_path = $uploadFileDir . $newFileName;
 
             if(move_uploaded_file($fileTmpPath, $dest_path)) {
-                $gambar = '../uploads/' . $newFileName;
+                $gambar = $newFileName; // Menyimpan nama file sesuai struktur direktori Anda
             }
         }
     } else {
@@ -41,7 +42,8 @@ if (isset($_POST['simpan'])) {
     }
 
     if (!empty($gambar)) {
-        $query = "INSERT INTO manga (nama, gambar, status) VALUES ('$nama', '$gambar', '$status')";
+        // Query insert dengan tambahan kolom review
+        $query = "INSERT INTO manga (nama, gambar, status, review) VALUES ('$nama', '$gambar', '$status', '$review')";
 
         if (mysqli_query($conn, $query)) {
             header("Location: index.php");
@@ -85,7 +87,7 @@ include '../templates/navbar.php';
                                 </div>
 
                                 <div id="inputUrlContainer">
-                                    <input type="url" name="gambar_url" id="inputUrl" class="form-control rounded-pill px-3" placeholder="https://..." >
+                                    <input type="url" name="gambar_url" id="inputUrl" class="form-control rounded-pill px-3" placeholder="https://..." required>
                                 </div>
 
                                 <div id="inputFileContainer" style="display: none;">
@@ -101,6 +103,12 @@ include '../templates/navbar.php';
                                     <option value="Unread">Unread</option>
                                     <option value="Finished">Finished</option>
                                 </select>
+                            </div>
+
+                            <!-- Input Review / Catatan -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Review / Catatan</label>
+                                <textarea name="review" class="form-control rounded-3" rows="3" placeholder="Tulis ulasan atau kesan-kesan singkat..."></textarea>
                             </div>
 
                             <div class="d-flex flex-column flex-sm-row gap-2 mt-4">

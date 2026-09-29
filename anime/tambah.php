@@ -10,6 +10,7 @@ if (!isset($_SESSION['login'])) {
 if (isset($_POST['simpan'])) {
     $nama   = mysqli_real_escape_string($conn, $_POST['nama']);
     $status = $_POST['status'];
+    $review = mysqli_real_escape_string($conn, $_POST['review']); // Tangkap input review
     $gambar = "";
 
     $tipe_input = $_POST['tipe_input'];
@@ -41,7 +42,8 @@ if (isset($_POST['simpan'])) {
     }
 
     if (!empty($gambar)) {
-        $query = "INSERT INTO anime (nama, gambar, status) VALUES ('$nama', '$gambar', '$status')";
+        // Tambahkan kolom review ke dalam query INSERT
+        $query = "INSERT INTO anime (nama, gambar, status, review) VALUES ('$nama', '$gambar', '$status', '$review')";
 
         if (mysqli_query($conn, $query)) {
             header("Location: index.php");
@@ -101,6 +103,12 @@ include '../templates/navbar.php';
                                     <option value="Unwatched">Unwatched</option>
                                     <option value="Finished">Finished</option>
                                 </select>
+                            </div>
+
+                            <!-- Tambahan Input Kolom Review -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Review / Catatan</label>
+                                <textarea name="review" class="form-control rounded-4 px-3 py-2" rows="4" placeholder="Tulis review atau catatan tentang anime ini..."></textarea>
                             </div>
 
                             <div class="d-flex flex-column flex-sm-row gap-2 mt-4">

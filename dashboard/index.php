@@ -14,16 +14,17 @@ $limit = 500;
 $page  = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $start = ($page > 1) ? ($page * $limit) - $limit : 0;
 
+// Menambahkan kolom review ke dalam setiap UNION ALL query
 $baseQuery = "
-    SELECT id, nama, gambar, status, 'Anime' AS kategori FROM anime
+    SELECT id, nama, gambar, status, review, 'Anime' AS kategori FROM anime
     UNION ALL
-    SELECT id, nama, gambar, status, 'Manga' AS kategori FROM manga
+    SELECT id, nama, gambar, status, review, 'Manga' AS kategori FROM manga
     UNION ALL
-    SELECT id, nama, gambar, status, 'Manhua' AS kategori FROM manhua
+    SELECT id, nama, gambar, status, review, 'Manhua' AS kategori FROM manhua
     UNION ALL
-    SELECT id, nama, gambar, status, 'Manhwa' AS kategori FROM manhwa
+    SELECT id, nama, gambar, status, review, 'Manhwa' AS kategori FROM manhwa
     UNION ALL
-    SELECT id, nama, gambar, status, 'Novel' AS kategori FROM novel
+    SELECT id, nama, gambar, status, review, 'Novel' AS kategori FROM novel
 ";
 
 $sqlFiltered = "SELECT * FROM ($baseQuery) AS all_data WHERE 1=1";
@@ -57,15 +58,18 @@ $title = "Dashboard List";
     <style>
         .card-item {
             position: relative;
-            border-radius: 10px;
+            border-radius: 12px;
             overflow: hidden;
             background-color: #fff0f3;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 12px rgba(255, 105, 180, 0.12);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
         .card-item:hover {
             transform: translateY(-4px);
-            box-shadow: 0 6px 15px rgba(255, 105, 180, 0.25);
+            box-shadow: 0 8px 20px rgba(255, 105, 180, 0.3);
         }
         
         .card-img-container {
@@ -119,6 +123,13 @@ $title = "Dashboard List";
             z-index: 2;
             text-transform: capitalize;
         }
+        .card-body-content {
+            padding: 8px 10px 10px 10px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
         .card-title-text {
             font-weight: 700;
             font-size: 0.85rem;
@@ -128,9 +139,23 @@ $title = "Dashboard List";
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            min-height: 2.5em;
-            margin-top: 6px;
-            padding: 0 3px;
+            margin-bottom: 6px;
+        }
+        /* Desain Kolom Review yang Cantik & Elegan */
+        .card-review-box {
+            background: rgba(255, 255, 255, 0.7);
+            border-left: 3px solid #ff3366;
+            padding: 5px 8px;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.72rem;
+            color: #555;
+            font-style: italic;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-top: auto;
+            word-break: break-word;
         }
         .filter-pill {
             border-radius: 20px;
@@ -206,11 +231,11 @@ $title = "Dashboard List";
                 </div>
                 
                 <!-- Layout Card Grid -->
-                <div class="row row-cols-3 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-2 g-md-3">
+                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-2 g-md-3">
                     <?php if (mysqli_num_rows($resultAll) > 0) : ?>
                         <?php while ($row = mysqli_fetch_assoc($resultAll)) : ?>
                             <div class="col">
-                                <a href="../<?= strtolower($row['kategori']); ?>/edit.php?id=<?= $row['id']; ?>" class="text-decoration-none">
+                                <a href="../<?= strtolower($row['kategori']); ?>/edit.php?id=<?= $row['id']; ?>" class="text-decoration-none h-100">
                                     <div class="card-item">
                                         <div class="card-img-container">
                                             <span class="badge-up">UP</span>
@@ -218,9 +243,17 @@ $title = "Dashboard List";
                                             <span class="badge-kategori"><?= $row['kategori']; ?></span>
                                             <span class="badge-status"><?= htmlspecialchars($row['status']); ?></span>
                                         </div>
-                                    </div>
-                                    <div class="card-title-text" title="<?= htmlspecialchars($row['nama']); ?>">
-                                        <?= htmlspecialchars($row['nama']); ?>
+                                        <div class="card-body-content">
+                                            <div class="card-title-text" title="<?= htmlspecialchars($row['nama']); ?>">
+                                                <?= htmlspecialchars($row['nama']); ?>
+                                            </div>
+                                            <!-- Tampilan Kolom Review / Catatan yang Cantik -->
+                                            <?php if (!empty($row['review'])): ?>
+                                                <div class="card-review-box" title="<?= htmlspecialchars($row['review']); ?>">
+                                                    “<?= htmlspecialchars($row['review']); ?>”
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
                                 </a>
                             </div>
